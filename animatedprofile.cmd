@@ -13,16 +13,16 @@ echo.
 fltmc >nul 2>&1
 
 if errorlevel 1 (
-    echo [ERROR] Script belum dijalankan sebagai Administrator.
+    echo [ERROR] This script is not running as Administrator.
     echo.
-    echo Klik kanan file CMD ini lalu:
+    echo Right-click this CMD file and select:
     echo Run as administrator
     echo.
     pause
     exit /b
 )
 
-echo [OK] Administrator permission
+echo [OK] Administrator permission granted.
 echo.
 
 :: ------------------------------------------------------------
@@ -31,7 +31,7 @@ echo.
 for /f "delims=" %%A in ('powershell.exe -NoProfile -Command "[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value"') do set "SID=%%A"
 
 if not defined SID (
-    echo [ERROR] Tidak bisa mendapatkan SID.
+    echo [ERROR] Unable to get the current user SID.
     pause
     exit /b
 )
@@ -47,13 +47,13 @@ set "PICKFILE=%TEMP%\gifpick.txt"
 
 del "%PICKFILE%" >nul 2>&1
 
-echo [*] Membuka pilihan GIF...
+echo [*] Opening GIF file picker...
 
-powershell.exe -NoProfile -STA -Command "Add-Type -AssemblyName System.Windows.Forms; $f=New-Object System.Windows.Forms.OpenFileDialog; $f.Title='Pilih GIF untuk Profile Picture'; $f.Filter='GIF Images (*.gif)|*.gif'; $f.Multiselect=$false; if($f.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK){[System.IO.File]::WriteAllText($env:TEMP+'\gifpick.txt',$f.FileName)}"
+powershell.exe -NoProfile -STA -Command "Add-Type -AssemblyName System.Windows.Forms; $f=New-Object System.Windows.Forms.OpenFileDialog; $f.Title='Select GIF for Profile Picture'; $f.Filter='GIF Images (*.gif)|*.gif'; $f.Multiselect=$false; if($f.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK){[System.IO.File]::WriteAllText($env:TEMP+'\gifpick.txt',$f.FileName)}"
 
 if not exist "%PICKFILE%" (
     echo.
-    echo [INFO] Tidak ada GIF dipilih.
+    echo [INFO] No GIF was selected.
     pause
     exit /b
 )
@@ -62,12 +62,12 @@ set /p "GIF="<"%PICKFILE%"
 del "%PICKFILE%" >nul 2>&1
 
 echo.
-echo [OK] GIF:
+echo [OK] Selected GIF:
 echo "%GIF%"
 echo.
 
 if not exist "%GIF%" (
-    echo [ERROR] GIF tidak ditemukan.
+    echo [ERROR] The selected GIF could not be found.
     pause
     exit /b
 )
@@ -84,13 +84,13 @@ copy /y "%GIF%" "%DEST%"
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Gagal copy GIF.
+    echo [ERROR] Failed to copy the GIF.
     pause
     exit /b
 )
 
 echo.
-echo [OK] GIF disimpan ke:
+echo [OK] GIF saved to:
 echo %DEST%
 echo.
 
@@ -100,26 +100,26 @@ echo.
 set "REGKEY=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AccountPicture\Users\%SID%"
 set "BACKUP=%PROFILEDIR%\AccountPicture-backup.reg"
 
-echo [*] Backup registry...
+echo [*] Backing up the registry...
 
 reg query "%REGKEY%" >nul 2>&1
 
 if not errorlevel 1 (
     if exist "%BACKUP%" (
-        echo [INFO] Backup asli sudah ada dan tidak akan ditimpa:
+        echo [INFO] The original backup already exists and will not be overwritten:
         echo      %BACKUP%
     ) else (
         reg export "%REGKEY%" "%BACKUP%" /y
         if errorlevel 1 (
-            echo [ERROR] Gagal membuat backup registry.
+            echo [ERROR] Failed to create the registry backup.
             pause
             exit /b 1
         )
-        echo [OK] Backup registry asli dibuat:
+        echo [OK] Original registry backup created:
         echo      %BACKUP%
     )
 ) else (
-    echo [WARNING] Registry AccountPicture belum ada; backup tidak dibuat.
+    echo [WARNING] The AccountPicture registry key does not exist; no backup was created.
 )
 
 echo.
@@ -144,7 +144,7 @@ echo reg add "%REGKEY%" /v Image424 /t REG_SZ /d "%DEST%" /f>>"%HELPER%"
 echo reg add "%REGKEY%" /v Image448 /t REG_SZ /d "%DEST%" /f>>"%HELPER%"
 echo reg add "%REGKEY%" /v Image1080 /t REG_SZ /d "%DEST%" /f>>"%HELPER%"
 
-echo [OK] Helper dibuat.
+echo [OK] SYSTEM helper created.
 echo.
 
 :: ------------------------------------------------------------
@@ -152,7 +152,7 @@ echo.
 :: ------------------------------------------------------------
 set "TASK=AnimatedProfilePicture"
 
-echo [*] Membuat temporary SYSTEM task...
+echo [*] Creating temporary SYSTEM task...
 
 schtasks /Delete /TN "%TASK%" /F >nul 2>&1
 
@@ -160,19 +160,19 @@ schtasks /Create /TN "%TASK%" /TR "\"%HELPER%\"" /SC ONCE /ST 23:59 /RU SYSTEM /
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Gagal membuat SYSTEM task.
+    echo [ERROR] Failed to create the SYSTEM task.
     pause
     exit /b
 )
 
 echo.
-echo [*] Menjalankan sebagai SYSTEM...
+echo [*] Applying changes as SYSTEM...
 
 schtasks /Run /TN "%TASK%"
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Gagal menjalankan SYSTEM task.
+    echo [ERROR] Failed to run the SYSTEM task.
     pause
     exit /b
 )
@@ -185,7 +185,7 @@ timeout /t 3 /nobreak
 schtasks /Delete /TN "%TASK%" /F >nul 2>&1
 
 echo.
-echo [OK] Temporary task dihapus.
+echo [OK] Temporary task removed.
 echo.
 
 :: ------------------------------------------------------------
@@ -205,17 +205,16 @@ echo.
 reg query "%REGKEY%" /v Image1080 >nul 2>&1
 
 if errorlevel 1 (
-    echo [ERROR] Image1080 tidak ditemukan.
+    echo [ERROR] Image1080 was not found.
     echo.
-    echo Jangan tutup window ini.
-    echo Kirim screenshot/output-nya ke aku.
+    echo Keep this window open and review the registry output above.
 ) else (
-    echo [SUCCESS] Registry berhasil diterapkan!
+    echo [SUCCESS] Animated profile picture applied successfully!
     echo.
-    echo Semua account picture diarahkan ke:
+    echo All account picture entries now point to:
     echo %DEST%
     echo.
-    echo Sekarang coba SIGN OUT lalu SIGN IN.
+    echo Sign out of Windows and sign back in to refresh the profile picture.
 )
 
 echo.
