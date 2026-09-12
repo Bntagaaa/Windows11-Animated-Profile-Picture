@@ -19,8 +19,6 @@ Use an animated GIF as your Windows 11 account/profile picture with two small `.
 - Task Scheduler service enabled
 - A `.gif` file
 
-No PsExec or other third-party utility is required.
-
 ## Before You Start
 
 It is recommended to first set a normal profile picture from **Settings → Accounts → Your info**. This helps ensure Windows has created the account-picture registry entries for your user.
