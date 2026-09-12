@@ -41,7 +41,13 @@ It is recommended to first set a normal profile picture from **Settings → Acco
 3. The normal Windows file picker will open.
 4. Select your `.gif` file.
 5. Wait for `[SUCCESS] Animated profile picture applied successfully!`.
-6. Sign out and sign back in. If needed, restart Windows once.
+6. All Done! You can see the changes on Settings, Start Menu, and Lock screen.
+
+
+
+> Note:
+> You may need system restart to see changes in the start menu
+
 
 The selected GIF is copied to:
 
