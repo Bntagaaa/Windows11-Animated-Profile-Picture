@@ -108,22 +108,7 @@ Keep `AccountPicture-backup.reg` if you want automatic rollback.
 
 ## Roll Back
 
-1. Right-click `rollback_animatedprofile.cmd`.
-2. Select **Run as administrator**.
-3. The script verifies that `AccountPicture-backup.reg` exists and belongs to the SID of the current user.
-4. It saves the current animated registry state as an additional safety backup:
-
-```text
-C:\ProgramData\AnimatedProfilePicture\AccountPicture-animated-state.reg
-```
-
-5. A temporary SYSTEM task deletes the modified account-picture key and imports the original backup.
-6. The script verifies that the registry no longer points to `profile.gif`.
-7. Only after successful verification are the GIF and temporary helper files removed.
-8. Wait for `[SUCCESS] The original profile picture registry state was restored successfully!`.
-9. Sign out and sign back in. Restart once if the old avatar is still cached.
-
-The `.reg` backup files are intentionally kept after rollback.
+1. Run  `rollback_animatedprofile.cmd`. as administrator.
 
 ## Files Created
 
