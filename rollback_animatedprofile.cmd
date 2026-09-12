@@ -12,16 +12,16 @@ echo.
 :: ------------------------------------------------------------
 fltmc >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Script belum dijalankan sebagai Administrator.
+    echo [ERROR] This script is not running as Administrator.
     echo.
-    echo Klik kanan file CMD ini lalu pilih:
+    echo Right-click this CMD file and select:
     echo Run as administrator
     echo.
     pause
     exit /b 1
 )
 
-echo [OK] Administrator permission
+echo [OK] Administrator permission granted.
 echo.
 
 :: ------------------------------------------------------------
@@ -30,7 +30,7 @@ echo.
 for /f "delims=" %%A in ('powershell.exe -NoProfile -Command "[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value"') do set "SID=%%A"
 
 if not defined SID (
-    echo [ERROR] Tidak bisa mendapatkan SID user.
+    echo [ERROR] Unable to get the current user SID.
     pause
     exit /b 1
 )
@@ -53,18 +53,18 @@ set "CURRENTBACKUP=%PROFILEDIR%\AccountPicture-animated-state.reg"
 :: CHECK ORIGINAL BACKUP
 :: ------------------------------------------------------------
 if not exist "%BACKUP%" (
-    echo [ERROR] Backup registry asli tidak ditemukan:
+    echo [ERROR] The original registry backup was not found:
     echo %BACKUP%
     echo.
-    echo Rollback otomatis dibatalkan supaya profile picture Windows
-    echo tidak rusak. Kamu masih bisa mengganti foto secara manual dari
-    echo Settings ^> Accounts ^> Your info.
+    echo Automatic rollback has been cancelled to avoid damaging the
+    echo Windows profile picture configuration. You can still change
+    echo the picture manually from Settings ^> Accounts ^> Your info.
     echo.
     pause
     exit /b 1
 )
 
-echo [OK] Backup asli ditemukan:
+echo [OK] Original backup found:
 echo      %BACKUP%
 echo.
 
@@ -77,16 +77,16 @@ powershell.exe -NoProfile -Command ^
 "$target='[%REGKEYFULL%]'; $content=Get-Content -LiteralPath '%BACKUP%' -Encoding Unicode; if($content -contains $target){exit 0}else{exit 1}" >nul 2>&1
 
 if errorlevel 1 (
-    echo [ERROR] Backup ditemukan, tapi header registry untuk SID ini tidak ditemukan.
+    echo [ERROR] The backup exists, but it does not contain the registry header for this SID.
     echo.
-    echo Yang dicari:
+    echo Expected header:
     echo [%REGKEYFULL%]
     echo.
-    echo Header registry yang ada di backup:
+    echo Registry headers found in the backup:
     powershell.exe -NoProfile -Command ^
     "Get-Content -LiteralPath '%BACKUP%' -Encoding Unicode ^| Where-Object { $_ -like '[[]*' }"
     echo.
-    echo Rollback dibatalkan untuk keamanan.
+    echo Rollback cancelled for safety.
     pause
     exit /b 1
 )
@@ -98,7 +98,7 @@ reg query "%REGKEY%" >nul 2>&1
 if not errorlevel 1 (
     reg export "%REGKEY%" "%CURRENTBACKUP%" /y >nul 2>&1
     if not errorlevel 1 (
-        echo [OK] Kondisi animated saat ini juga dibackup:
+        echo [OK] Current animated state also backed up to:
         echo      %CURRENTBACKUP%
         echo.
     )
@@ -114,7 +114,7 @@ if not errorlevel 1 (
 >>"%HELPER%" echo reg import "%BACKUP%"
 
 if not exist "%HELPER%" (
-    echo [ERROR] Gagal membuat rollback helper.
+    echo [ERROR] Failed to create the rollback helper.
     pause
     exit /b 1
 )
@@ -122,22 +122,22 @@ if not exist "%HELPER%" (
 :: ------------------------------------------------------------
 :: RUN HELPER AS SYSTEM
 :: ------------------------------------------------------------
-echo [*] Menyiapkan rollback sebagai SYSTEM...
+echo [*] Preparing rollback as SYSTEM...
 
 schtasks /Delete /TN "%TASK%" /F >nul 2>&1
 
 schtasks /Create /TN "%TASK%" /TR "\"%HELPER%\"" /SC ONCE /ST 23:59 /RU SYSTEM /RL HIGHEST /F >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Gagal membuat temporary SYSTEM task.
+    echo [ERROR] Failed to create the temporary SYSTEM task.
     echo.
     pause
     exit /b 1
 )
 
-echo [*] Mengembalikan registry asli...
+echo [*] Restoring the original registry state...
 schtasks /Run /TN "%TASK%" >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Gagal menjalankan rollback task.
+    echo [ERROR] Failed to run the rollback task.
     schtasks /Delete /TN "%TASK%" /F >nul 2>&1
     echo.
     pause
@@ -161,9 +161,9 @@ echo.
 :: If profile.gif is still referenced, rollback did not take effect.
 reg query "%REGKEY%" 2>nul | findstr /I /L "C:\ProgramData\AnimatedProfilePicture\profile.gif" >nul
 if not errorlevel 1 (
-    echo [ERROR] Registry masih menunjuk ke profile.gif.
-    echo File GIF tidak akan dihapus.
-    echo Kirim output di atas untuk dicek.
+    echo [ERROR] The registry still points to profile.gif.
+    echo The GIF file will not be deleted.
+    echo Review the registry output above for troubleshooting.
     echo.
     pause
     exit /b 1
@@ -177,13 +177,13 @@ del "%PROFILEDIR%\profile.gif" >nul 2>&1
 del "%PROFILEDIR%\apply.cmd" >nul 2>&1
 del "%HELPER%" >nul 2>&1
 
-echo [SUCCESS] Profile picture registry berhasil dikembalikan.
+echo [SUCCESS] The original profile picture registry state was restored successfully!
 echo.
-echo File GIF dan helper animated profile sudah dibersihkan.
-echo Backup .reg tetap disimpan di:
+echo The animated GIF and temporary helper files have been removed.
+echo Registry backup files are still stored in:
 echo %PROFILEDIR%
 echo.
-echo Sekarang SIGN OUT lalu SIGN IN lagi.
-echo Kalau avatar masih ter-cache, restart Windows sekali.
+echo Sign out of Windows and sign back in.
+echo If the old avatar is still cached, restart Windows once.
 echo.
 pause
