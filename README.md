@@ -5,6 +5,14 @@ Use an animated GIF as your Windows 11 account/profile picture with two small `.
 > [!IMPORTANT]
 > This is an **unofficial Windows workaround**, not a Microsoft-supported animated-profile-picture feature. Windows updates, account-picture sync, or changing your picture from Settings may overwrite the change.
 
+## Credits
+
+The Windows registry workaround that makes transparent and animated profile pictures possible was shared by **PatRyk (@Patrosi73)** on X on September 6, 2026.
+
+Original discovery/post: https://x.com/Patrosi73/status/2096652760494088376
+
+This repository packages that registry technique into an easier `.cmd` workflow with a Windows GIF file picker, automatic SYSTEM-level application, first-run backup preservation, verification, and rollback.
+
 ## Files
 
 - **`animatedprofile.cmd`** — choose a GIF, preserve the original registry state, and apply the animated profile picture.
@@ -32,7 +40,7 @@ It is recommended to first set a normal profile picture from **Settings → Acco
 2. Right-click it and select **Run as administrator**.
 3. The normal Windows file picker will open.
 4. Select your `.gif` file.
-5. Wait for `[SUCCESS] Registry berhasil diterapkan!`.
+5. Wait for `[SUCCESS] Animated profile picture applied successfully!`.
 6. Sign out and sign back in. If needed, restart Windows once.
 
 The selected GIF is copied to:
@@ -106,7 +114,8 @@ C:\ProgramData\AnimatedProfilePicture\AccountPicture-animated-state.reg
 5. A temporary SYSTEM task deletes the modified account-picture key and imports the original backup.
 6. The script verifies that the registry no longer points to `profile.gif`.
 7. Only after successful verification are the GIF and temporary helper files removed.
-8. Sign out and sign back in. Restart once if the old avatar is still cached.
+8. Wait for `[SUCCESS] The original profile picture registry state was restored successfully!`.
+9. Sign out and sign back in. Restart once if the old avatar is still cached.
 
 The `.reg` backup files are intentionally kept after rollback.
 
