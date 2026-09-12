@@ -43,7 +43,7 @@ It is recommended to first set a normal profile picture from **Settings → Acco
 5. Wait for `[SUCCESS] Animated profile picture applied successfully!`.
 6. All Done! You can see the changes on Settings, Start Menu, and Lock screen.
 
-
+https://github.com/Bntagaaa/Windows11-Animated-Profile-Picture/blob/main/tes%20vdieo_1.mp4
 
 > Note:
 > You may need system restart to see changes in the start menu
